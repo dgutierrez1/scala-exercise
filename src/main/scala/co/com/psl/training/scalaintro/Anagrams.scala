@@ -36,10 +36,22 @@ object Anagrams {
   // ------------------------------------------------------------------------------------------- //
 
   /** Given a word, produces its occurrence list. */
-  def wordOccurrences(w: Word): Occurrences = ???
+  def wordOccurrences(w: Word): Occurrences = {
+    val res: collection.mutable.Map[Char, Int] = collection.mutable.Map()
+    w.toLowerCase
+      .toList
+      .foreach(c => {
+        res(c) = res.getOrElseUpdate(c, 0) + 1
+      })
+    res.toList
+  }
+
 
   /** Given a sentence, produces its occurrence list. */
-  def sentenceOccurrences(s: Sentence): Occurrences = ???
+  def sentenceOccurrences(s: Sentence): Occurrences = {
+    // wordOccurrences(s.reduce((acc, w) => acc+w))
+    wordOccurrences(s.mkString)
+  }
 
   // ------------------------------------------------------------------------------------------- //
   // Part 2: Computing Anagrams of a Word. ----------------------------------------------------- //
@@ -49,7 +61,6 @@ object Anagrams {
   def wordAnagrams(word: Word): List[Word] =
     dictionary.filter(w => wordOccurrences(w) == wordOccurrences(word))
   // I am pretty sure there are better ways of doing this, don't you?
-
   // ------------------------------------------------------------------------------------------- //
   // Part 3: Computing Anagrams of a Sentence. ------------------------------------------------- //
   // ------------------------------------------------------------------------------------------- //
@@ -61,7 +72,18 @@ object Anagrams {
    *
    *  Note: There is only one subset of an empty list, and that is the empty list itself.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = ???
+  def combinations(occurrences: Occurrences): List[Occurrences] = {
+    if (occurrences.isEmpty) List(List())
+    else {
+      val head = occurrences.head
+      val combos: List[Occurrences] = combinations(occurrences.tail)
+      (for {
+        combo <- combos
+        n <- 1 to head._2
+      } yield (head._1, n) :: combo) ++ combos
+    }
+  }
+
 
   /**
    * We now implement another helper method which:
